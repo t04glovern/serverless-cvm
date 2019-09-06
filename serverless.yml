@@ -1,0 +1,65 @@
+service: serverless-cvm
+
+plugins:
+  - serverless-pseudo-parameters
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - iot:CreateThing
+        - iot:AttachPolicy
+        - iot:DetachPolicy
+        - iot:AttachThingPrincipal
+        - iot:DetachThingPrincipal
+        - iot:CreatePolicy
+        - iot:CreateKeysAndCertificate
+        - iot:UpdateCertificate
+        - iot:DeleteCertificate
+        - iot:GetThingShadow
+        - iot:UpdateThingShadow
+      Resource:
+        - "*"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+      Resource:
+        - "Fn::GetAtt": [ DeviceInfoDynamoDBTable, Arn ]
+    - Effect: Allow
+      Action:
+        - logs:*
+      Resource:
+        - arn:aws:logs:*:*:*
+
+functions:
+  cvm:
+    handler: cvm/index.handler
+    events:
+      - http:
+          path: getcert
+          method: get
+      - http:
+          path: shadow
+          method: any
+    environment:
+      REGION: "#{AWS::Region}"
+      DYNAMODB_TABLE_NAME: !Ref DeviceInfoDynamoDBTable
+
+resources:
+ Resources:
+    DeviceInfoDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: iot-cvm-device-info
+        AttributeDefinitions:
+          - AttributeName: serialNumber
+            AttributeType: S
+        KeySchema:
+          - AttributeName: serialNumber
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST

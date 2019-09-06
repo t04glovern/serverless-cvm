@@ -1,0 +1,17 @@
+{
+  "name": "serverless-cvm",
+  "description": "Serverless implmenetation of Certificate Vending Machine (CVM)",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-pseudo-parameters": "^2.4.0"
+  },
+  "author": "Nathan Glover <nathan@glovers.id.au>",
+  "keywords": [
+    "aws",
+    "iot",
+    "certificate",
+    "serverless"
+  ],
+  "license": "Apache-2.0"
+}
