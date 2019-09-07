@@ -2,6 +2,8 @@
 
 Based on [awslabs/aws-iot-certificate-vending-machine](awslabs/aws-iot-certificate-vending-machine) this deployment uses Serverless framework instead
 
+Serverless Certificate Vending Machine is a pattern for managing AWS IoT Devices in a secure and repeatable way. Learn how to deploy your own CVM and onboard new devices.
+
 ![Architecture](img/cvm.png)
 
 ## Setup Serverless
