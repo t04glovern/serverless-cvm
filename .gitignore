@@ -7,3 +7,8 @@ jspm_packages
 
 # Misc
 node_modules/
+env.yml
+
+# Certs
+certs/*
+!certs/.gitkeep

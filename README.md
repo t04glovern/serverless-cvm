@@ -2,6 +2,8 @@
 
 Based on [awslabs/aws-iot-certificate-vending-machine](awslabs/aws-iot-certificate-vending-machine) this deployment uses Serverless framework instead
 
+![Architecture](img/cvm.png)
+
 ## Setup Serverless
 
 ```bash
@@ -22,6 +24,18 @@ plugins:
   - serverless-pseudo-parameters
 ```
 
+### Env File
+
+Create a copy of `env.yml.sample` as `env.yml` and update the `IOT_DATA_ENDPOINT` variable with the endpoint address from the following commnad
+
+```bash
+aws iot describe-endpoint --endpoint-type iot:Data-ATS
+
+# {
+#     "endpointAddress": "XXXXXX-ats.iot.us-east-1.amazonaws.com"
+# }
+```
+
 ## Deploy
 
 ```bash
@@ -31,8 +45,8 @@ serverless deploy
 # api keys:
 #   None
 # endpoints:
-#   GET - https://XXXXXXXXXXXXX.execute-api.us-east-1.amazonaws.com/dev/getcert
-#   ANY - https://XXXXXXXXXXXXX.execute-api.us-east-1.amazonaws.com/dev/shadow
+#   GET - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/getcert
+#   ANY - https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/shadow
 # functions:
 #   cvm: serverless-cvm-dev-cvm
 # layers:
@@ -41,27 +55,34 @@ serverless deploy
 
 ## Create Device
 
+Replace the device token with something secure and add a new entry to the DB
+
 ```bash
 aws dynamodb put-item \
   --table-name iot-cvm-device-info \
-  --item '{"deviceToken":{"S":"secret_key"},"serialNumber":{"S":"devopstar-iot-01"}}'
+  --item '{"deviceToken":{"S":"1234567890"},"serialNumber":{"S":"devopstar-iot-01"}}'
 ```
 
 ### Retrieve Certificates
 
-```bash
-https://XXXXXXXXXXXXX.execute-api.us-east-1.amazonaws.com/dev/getcert?serialNumber=devopstar-iot-01&deviceToken=secret_key
+Run the following command to generate the certificates based on the json recieved from the request.
 
-# {
-#     "certificateArn": "arn:aws:iot:us-east-1::cert/009f.........",
-#     "certificateId": "009ff......",
-#     "certificatePem": "-----BEGIN CERTIFICATE-----\nMIIDW......-----END CERTIFICATE-----\n",
-#     "keyPair": {
-#         "PublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIj.......-----END PUBLIC KEY-----\n",
-#         "PrivateKey": "-----BEGIN RSA PRIVATE KEY-----\nMI........-----END RSA PRIVATE KEY-----\n"
-#     },
-#     "RootCA": "-----BEGIN CERTIFICATE-----\r\nMIIE0zCC........-----END CERTIFICATE-----"
-# }
+*Note: You'll need `jq` installed for this*
+
+```bash
+./create_certs.sh "https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/getcert?serialNumber=devopstar-iot-01&deviceToken=1234567890"
+```
+
+This should create your certs in the following files based on the json keys
+
+* **iot-certificate.pem.crt**: certificatePem
+* **iot-private.pem.key**: keyPair.PrivateKey
+* **iot-root-ca.crt**: RootCA
+
+### Retrieve Shadow State
+
+```bash
+https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/shadow?serialNumber=devopstar-iot-01&deviceToken=1234567890
 ```
 
 ## Attribution

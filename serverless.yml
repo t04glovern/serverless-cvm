@@ -3,6 +3,9 @@ service: serverless-cvm
 plugins:
   - serverless-pseudo-parameters
 
+custom:
+  environment: ${file(env.yml):dev}
+
 provider:
   name: aws
   runtime: nodejs10.x
@@ -49,6 +52,7 @@ functions:
     environment:
       REGION: "#{AWS::Region}"
       DYNAMODB_TABLE_NAME: !Ref DeviceInfoDynamoDBTable
+      IOT_DATA_ENDPOINT: ${self:custom.environment.IOT_DATA_ENDPOINT}
 
 resources:
  Resources:
