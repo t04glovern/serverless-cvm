@@ -6,6 +6,11 @@ plugins:
 custom:
   environment: ${file(env.yml):dev}
 
+package:
+  exclude:
+    - certs/**
+    - img/**
+
 provider:
   name: aws
   runtime: nodejs10.x

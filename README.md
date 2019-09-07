@@ -79,10 +79,20 @@ This should create your certs in the following files based on the json keys
 * **iot-private.pem.key**: keyPair.PrivateKey
 * **iot-root-ca.crt**: RootCA
 
-### Retrieve Shadow State
+### Shadow State
+
+#### PUT Shadow State
 
 ```bash
-https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/shadow?serialNumber=devopstar-iot-01&deviceToken=1234567890
+curl \
+  -d '{"deviceAttribute":"CVM"}' \
+  -X PUT "https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/shadow?serialNumber=devopstar-iot-01&deviceToken=1234567890"
+```
+
+#### GET Shadow State
+
+```bash
+curl -X GET "https://XXXXXX.execute-api.us-east-1.amazonaws.com/dev/shadow?serialNumber=devopstar-iot-01&deviceToken=1234567890"
 ```
 
 ## Attribution
